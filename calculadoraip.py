@@ -33,7 +33,7 @@ class CalculadoraIp:
             EnderecoRedeBin.append(RedeOcteto)
         return ".".join(str(int(octeto, 2)) for octeto in EnderecoRedeBin) #Tá transformando de binário pra decimal e juntando os octetos
 
-    #Função para calcular o endereço broadcast, usei quase a mesma lógica do endereço de rede só mudou que uso "or = |" nvés de "and = &" e também a mascara é invertida
+    #Função para calcular o endereço broadcast, usei quase a mesma lógica do endereço de rede só mudou que uso "or = |" invés de "and = &" e também a mascara é invertida
     def calcularBroadcast(self):
         IpBin = self.IpParaBinario(self.EnderecoIp).split(".") #Nessa parte eu uso a mesma lógica para separa os octetos
         MascaraBin = self.MascaraSubredeParaBinario(self.MascaraSubrede).split(".")
@@ -43,7 +43,22 @@ class CalculadoraIp:
             BroadcastBin.append(BroadcastOcteto)
         return ".".join(str(int(octeto, 2)) for octeto in BroadcastBin)
 
+    def calcularFaixaEnderecosValidos(self):
+        self.EnderecoRede = self.calcularEnderecoRede().split(".")
+        self.Broadcast = self.calcularBroadcast().split(".")  
+        RedeOctetos = []
+        for octeto in self.EnderecoRede:  #Loop pelos octetos do endereço de rede
+            RedeOctetos.append(int(octeto))  #Adiciona o octeto convertido para inteiro
+        BroadcastOctetos = []
+        for octeto in self.Broadcast:  #Usa mesma lógica do de cima
+            BroadcastOctetos.append(int(octeto))  
+
+        PrimeiroEndereco = f"{RedeOctetos[0]}.{RedeOctetos[1]}.{RedeOctetos[2]}.{RedeOctetos[3] + 1}"  #Primeiro endereço válido
+        UltimoEndereco = f"{BroadcastOctetos[0]}.{BroadcastOctetos[1]}.{BroadcastOctetos[2]}.{BroadcastOctetos[3] - 1}"  #Último endereço válido
+        return PrimeiroEndereco, UltimoEndereco
+
 c1 = CalculadoraIp("192.168.1.10", "255.255.255.0")
 print(f"Endereço de rede: {c1.calcularEnderecoRede()}")
 print(f"Endereço Broadcast: {c1.calcularBroadcast()}")
+print(f"Intervalo de Endereços Válidos: {c1.calcularFaixaEnderecosValidos()[0]} a{c1.calcularFaixaEnderecosValidos()[1]}")
 
