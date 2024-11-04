@@ -9,6 +9,15 @@ class CalculadoraIp:
         self.EnderecoIp = EnderecoIp
         self.MascaraSubrede = MascaraSubrede
 
+    def verificarEnderecoIPValido(self): #Aqui vai verificar se o IP é valido
+        octetos = self.EnderecoIp.split(".") #Vai separar na lista
+        if len(octetos) != 4: #Se o números de octetos for diferente de 4 vai dizer que não é valido
+            return "Não"
+        for octeto in octetos:
+            if not (0 <= int(octeto) <= 255): #Garante que o IP esteja dentro dos limites permitidos
+                return "Não"
+        return "Sim"
+
     #Convertendo o IP para binário
     def IpParaBinario(self, EnderecoIp: str):
         octetos = EnderecoIp.split(".") #Com algumas pesquisas acabei optando por usar a função nativa "split()", ela vai separar os octetos de acordo com o delimitador que é "."
@@ -60,16 +69,7 @@ class CalculadoraIp:
         return PrimeiroEndereco, UltimoEndereco
 
 c1 = CalculadoraIp("192.168.1.10", "255.255.255.0")
+print(f"Endereço IP Válido: {c1.verificarEnderecoIPValido()}")
 print(f"Endereço de rede: {c1.calcularEnderecoRede()}")
 print(f"Endereço Broadcast: {c1.calcularBroadcast()}")
 print(f"Intervalo de Endereços Válidos: {c1.calcularFaixaEnderecosValidos()[0]} a {c1.calcularFaixaEnderecosValidos()[1]}")
-
-st.title("Calculadora IP")
-EnderecoIp = st.text_input("Endereço IP:")
-MascaraSubrede = st.text_input("Máscara de Sub-rede:")
-
-if st.button("Calcular"):
-    c1 = CalculadoraIp(EnderecoIp, MascaraSubrede)
-    st.write(f"Endereço de rede: {c1.calcularEnderecoRede()}")
-    st.write(f"Endereço Broadcast: {c1.calcularBroadcast()}")
-    st.write(f"Intervalo de Endereços Válidos: {c1.calcularFaixaEnderecosValidos()[0]} a {c1.calcularFaixaEnderecosValidos()[1]}")
