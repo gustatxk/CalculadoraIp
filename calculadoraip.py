@@ -2,6 +2,8 @@
 #Irei utilizar POO para fazer está calculadora
 #A interface será feita utilizando a bilioteca "Streamlit"
 
+import streamlit as st
+
 class CalculadoraIp:
     def __init__(self, EnderecoIp: str, MascaraSubrede: str):
         self.EnderecoIp = EnderecoIp
@@ -9,7 +11,7 @@ class CalculadoraIp:
 
     #Convertendo o IP para binário
     def IpParaBinario(self, EnderecoIp: str):
-        octetos = EnderecoIp.split(".") #Com algumas pesquisas acabei obtando por usar a função nativa "split()", ela vai separar os octetos de acordo com o delimitador que é "."
+        octetos = EnderecoIp.split(".") #Com algumas pesquisas acabei optando por usar a função nativa "split()", ela vai separar os octetos de acordo com o delimitador que é "."
         BinarioIp = ""
         for octeto in octetos:
             BinarioIp += format(int(octeto), "08b") + "." #Esse "08b" converte um número para binário sempre mostrando 8 bits, e coloca zeros à esquerda se precisar
@@ -60,5 +62,14 @@ class CalculadoraIp:
 c1 = CalculadoraIp("192.168.1.10", "255.255.255.0")
 print(f"Endereço de rede: {c1.calcularEnderecoRede()}")
 print(f"Endereço Broadcast: {c1.calcularBroadcast()}")
-print(f"Intervalo de Endereços Válidos: {c1.calcularFaixaEnderecosValidos()[0]} a{c1.calcularFaixaEnderecosValidos()[1]}")
+print(f"Intervalo de Endereços Válidos: {c1.calcularFaixaEnderecosValidos()[0]} a {c1.calcularFaixaEnderecosValidos()[1]}")
 
+st.title("Calculadora IP")
+EnderecoIp = st.text_input("Endereço IP:")
+MascaraSubrede = st.text_input("Máscara de Sub-rede:")
+
+if st.button("Calcular"):
+    c1 = CalculadoraIp(EnderecoIp, MascaraSubrede)
+    st.write(f"Endereço de rede: {c1.calcularEnderecoRede()}")
+    st.write(f"Endereço Broadcast: {c1.calcularBroadcast()}")
+    st.write(f"Intervalo de Endereços Válidos: {c1.calcularFaixaEnderecosValidos()[0]} a {c1.calcularFaixaEnderecosValidos()[1]}")
