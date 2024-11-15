@@ -21,9 +21,9 @@ Além disso, a aplicação tem uma interface gráfica simples desenvolvida com S
 - Verificação de IP público ou privado.
 - Exibição dos resultados em uma tabela gerada com a biblioteca pandas.
 
-  # Dependências
-  Este projeto requer a instalação de algumas bibliotecas. Você pode instalar todas as dependências necessárias utilizando o arquivo requirements.txt.
-  Bibliotecas utilizadas:
+# Dependências
+Este projeto requer a instalação de algumas bibliotecas. Você pode instalar todas as dependências necessárias utilizando o arquivo requirements.txt.
+Bibliotecas utilizadas:
     - streamlit: Para criar a interface gráfica interativa e fácil de usar.
     - pandas: Para gerar e exibir a tabela de resultados.
     - ipaddress: Para cálculos de redes IPv4 e manipulação de endereços IP (já incluída no Python 3.3 ou superior).
@@ -36,19 +36,19 @@ Além disso, a aplicação tem uma interface gráfica simples desenvolvida com S
   3. Instale as dependências:
      'pip install -r requirements.txt'
 
-  # Como executar
+# Como executar
   Após instalar as dependências, você pode executar a aplicação com Streamlit para visualizar a interface gráfica.
   1. Para iniciar a aplicação, use o comando:
      'streamlit run app.py' caso não funcione use 'python -m streamlit run app.py' 
   2. Isso abrirá a interface no seu navegador (geralmente em http://localhost:8501), onde você poderá inserir o endereço IP e a máscara de sub-rede. O sistema calculará e exibirá as informações detalhadas sobre a rede, como endereço de rede, primeiro e último host, endereço de broadcast, entre outros.
 
  # Estrutura do Projeto
- CalculadoraIp/
- │
- ├── app.py                  # Interface gráfica com Streamlit
- ├── calculadoraip.py         # Lógica de cálculos de IP e geração da tabela
- ├── requirements.txt         # Arquivo de dependências
- └── README.md                # Este arquivo de instruções
+ CalculadoraIp/ <br>
+ │<br>
+ ├── app.py                  # Interface gráfica com Streamlit<br>
+ ├── calculadoraip.py         # Lógica de cálculos de IP e geração da tabela<br>
+ ├── requirements.txt         # Arquivo de dependências<br>
+ └── README.md                # Este arquivo de instruções<br>
 
 calculadoraip.py: 
 Este arquivo contém a implementação da Calculadora de IP, utilizando Programação Orientada a Objetos (POO) para realizar cálculos de rede.
