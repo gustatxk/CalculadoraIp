@@ -45,17 +45,11 @@ class CalculadoraIp:
     def calcularEnderecoBroadcast(self):  #Aqui tá calculando o endereço de broadcast da rede
         return self.rede.broadcast_address
 
-    def calcularNumeroSubredes(self):  #Aqui tá calculando o número de sub-redes possíveis
-        comprimentoMascara = self.rede.prefixlen 
-        mascaraPadrao = { 
-            'A': 8,
-            'B': 16,
-            'C': 24
-        }.get(self.classeEndereco, 0)  #Obtém o valor de máscara padrão com base na classe de IP
-        
-        #Calcula o número de sub-redes possíveis dependendo da máscara
-        return 2 ** (comprimentoMascara - mascaraPadrao) if mascaraPadrao < comprimentoMascara else 1  
-    
+    def calcularNumeroSubredes(self):
+        prefixo_inicial = self.rede.network_address.max_prefixlen - self.rede.hostmask._prefix_from_ip_string(str(self.rede.hostmask))
+        prefixo_final = self.rede.prefixlen
+        return 2 ** (prefixo_final - prefixo_inicial)
+
     def calcularHostsPorSubrede(self):  #Calculando o número de hosts por sub-rede
         return self.rede.num_addresses 
     

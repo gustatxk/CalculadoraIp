@@ -9,16 +9,18 @@ def main():
     mascaraSubrede = st.text_input("Digite a máscara de sub-rede (Ex: 255.255.255.0):") #Campo da máscara
     
     if st.button("Calcular"): #Botão que chama a classe "CalculadoraIp"
-        if enderecoIp and mascaraSubrede:
+        if enderecoIp and mascaraSubrede:  #Verificaçã pra saber  se ambos dos campos estão preenchidos
             try:
-                calculadora = CalculadoraIp(enderecoIp, mascaraSubrede)
-                tabela = calculadora.gerarTabela()
-                st.write("Detalhes do Cálculo do IP:")
-                st.dataframe(tabela, use_container_width=True, hide_index=True)
-            except ValueError as e:
-                st.error(f"Erro: {e}")
+                with st.spinner('Calculando...'):
+                    calculadora = CalculadoraIp(enderecoIp, mascaraSubrede) #Cria o objeto da calculadora
+                    tabela = calculadora.gerarTabela()  
+
+                st.write("Detalhes do Cálculo do IP:")  # Exibe o título para os resultados
+                st.dataframe(tabela, use_container_width=True, hide_index=True)  # Exibe a tabela
+            except ValueError as e:  # Caso haja algum erro
+                st.error(f"Erro: {e}")  # Exibe a mensagem de erro
         else:
-            st.warning("Por favor, insira tanto o endereço IP quanto a máscara de sub-rede.")
+            st.warning("Por favor, insira tanto o endereço IP quanto a máscara de sub-rede.")  # Mensagem de aviso
 
 if __name__ == "__main__":
     main()
