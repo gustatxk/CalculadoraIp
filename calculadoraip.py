@@ -1,75 +1,98 @@
 #Calculadora Ip
 #Irei utilizar POO para fazer está calculadora
-#A interface será feita utilizando a bilioteca "Streamlit"
+#Vou usar a biblioteca "ipaddress" para fazer os cálculos
+#A tabela que exibi os dados irei utilizar a biblioteca "Pandas"
 
-import streamlit as st
+from ipaddress import *  #Importando a biblioteca ipaddress para os cálculos
+import pandas as pd  #Importando pandas para fazer a tabela
 
 class CalculadoraIp:
-    def __init__(self, EnderecoIp: str, MascaraSubrede: str):
-        self.EnderecoIp = EnderecoIp
-        self.MascaraSubrede = MascaraSubrede
+    def __init__(self, enderecoIp, mascaraSubrede):  #Aqui e o método construtor da classe
+        self.enderecoIp = enderecoIp  
+        self.mascaraSubrede = mascaraSubrede  
+        self.rede = IPv4Network(f"{enderecoIp}/{mascaraSubrede}", strict=False)  #Cria um objeto de rede IPv4 com o endereço IP e a máscara
+        self.classeEndereco = self.definirClasseIp(enderecoIp)  #chama a função para definir a classe do IP
 
-    def verificarEnderecoIPValido(self): #Aqui vai verificar se o IP é valido
-        octetos = self.EnderecoIp.split(".") #Vai separar na lista
-        if len(octetos) != 4: #Se o números de octetos for diferente de 4 vai dizer que não é valido
-            return "Não"
-        for octeto in octetos:
-            if not (0 <= int(octeto) <= 255): #Garante que o IP esteja dentro dos limites permitidos
-                return "Não"
-        return "Sim"
+    def mascaraParaPrefixo(self):  #função para a conversão da máscara de sub-rede para o formato de prefixo CIDR
+        mascara_ip = self.mascaraSubrede.split(".")
+        prefixo = sum([bin(int(part)).count("1") for part in mascara_ip])  #Conta os bits 1 de cada octeto e soma
+        return f"/{prefixo}"  #Retorna o prefixo no formato CIDR (ex: /24)
 
-    #Convertendo o IP para binário
-    def IpParaBinario(self, EnderecoIp: str):
-        octetos = EnderecoIp.split(".") #Com algumas pesquisas acabei optando por usar a função nativa "split()", ela vai separar os octetos de acordo com o delimitador que é "."
-        BinarioIp = ""
-        for octeto in octetos:
-            BinarioIp += format(int(octeto), "08b") + "." #Esse "08b" converte um número para binário sempre mostrando 8 bits, e coloca zeros à esquerda se precisar
-        return BinarioIp[:-1]
+    def definirClasseIp(self, ip):  #Função para definir a classe do IP
+       primeiroOcteto = int(ip.split('.')[0]) 
+       if 1 <= primeiroOcteto <= 126:
+            return 'A'  
+       elif 128 <= primeiroOcteto <= 191:
+            return 'B' 
+       elif 192 <= primeiroOcteto <= 223:
+            return 'C'  
+       elif 224 <= primeiroOcteto <= 239:
+            return 'D' 
+       elif 240 <= primeiroOcteto <= 255:
+            return 'E'
+       else:
+            return 'Desconhecida'
+
+    def calcularEnderecoRede(self):  #Aqui tá calculando o endereço de rede a partir do IP e da máscara
+        return self.rede.network_address 
+
+    def calcularPrimeiroHost(self):  #Aqui tá calculando o primeiro host disponível na rede
+        return list(self.rede.hosts())[0] 
+
+    def calcularUltimoHost(self):  #Aqui tá calculando o último host disponível na rede
+        return list(self.rede.hosts())[-1]
+
+    def calcularEnderecoBroadcast(self):  #Aqui tá calculando o endereço de broadcast da rede
+        return self.rede.broadcast_address
+
+    def calcularNumeroSubredes(self):  #Aqui tá calculando o número de sub-redes possíveis
+        comprimentoMascara = self.rede.prefixlen 
+        mascaraPadrao = { 
+            'A': 8,
+            'B': 16,
+            'C': 24
+        }.get(self.classeEndereco, 0)  #Obtém o valor de máscara padrão com base na classe de IP
+        
+        #Calcula o número de sub-redes possíveis dependendo da máscara
+        return 2 ** (comprimentoMascara - mascaraPadrao) if mascaraPadrao < comprimentoMascara else 1  
     
-    #Convertendo a mascara de subrede para binário
-    def MascaraSubredeParaBinario(self, MascaraSubrede: str): #Aqui vou usar a mesma lógica que usei para o ip
-        octetos = MascaraSubrede.split(".")
-        BinarioMascara = ""
-        for octeto in octetos:
-            BinarioMascara += format(int(octeto), "08b") + "."
-        return BinarioMascara[:-1]
+    def calcularHostsPorSubrede(self):  #Calculando o número de hosts por sub-rede
+        return self.rede.num_addresses 
     
-    #Função para calcular o endereco de rede    
-    def calcularEnderecoRede(self):
-        IpBin = self.IpParaBinario(self.EnderecoIp).split(".") #Separando os octetos em listas
-        MascaraBin = self.MascaraSubredeParaBinario(self.MascaraSubrede).split(".") 
-        EnderecoRedeBin = []
-        for i in range(4):  #Como eu já sei que o IP e a máscara têm 4 octetos
-            RedeOcteto = format(int(IpBin[i], 2) & int(MascaraBin[i], 2), '08b') #Aqui ta fazendo a operação AND bit a bit
-            EnderecoRedeBin.append(RedeOcteto)
-        return ".".join(str(int(octeto, 2)) for octeto in EnderecoRedeBin) #Tá transformando de binário pra decimal e juntando os octetos
-
-    #Função para calcular o endereço broadcast, usei quase a mesma lógica do endereço de rede só mudou que uso "or = |" invés de "and = &" e também a mascara é invertida
-    def calcularBroadcast(self):
-        IpBin = self.IpParaBinario(self.EnderecoIp).split(".") #Nessa parte eu uso a mesma lógica para separa os octetos
-        MascaraBin = self.MascaraSubredeParaBinario(self.MascaraSubrede).split(".")
-        BroadcastBin = []
-        for i in range(4):
-            BroadcastOcteto = format(int(IpBin[i], 2) | (int(MascaraBin[i], 2) ^ 0xFF), '08b') #Aqui a máscara é invetida (inverte os bits) e também é realizado a operação OR com o IP, uso o "0xFF" porque ele transforma os bits de rede em 0 e os bits de host em 1
-            BroadcastBin.append(BroadcastOcteto)
-        return ".".join(str(int(octeto, 2)) for octeto in BroadcastBin)
-
-    def calcularFaixaEnderecosValidos(self):
-        self.EnderecoRede = self.calcularEnderecoRede().split(".")
-        self.Broadcast = self.calcularBroadcast().split(".")  
-        RedeOctetos = []
-        for octeto in self.EnderecoRede:  #Loop pelos octetos do endereço de rede
-            RedeOctetos.append(int(octeto))  #Adiciona o octeto convertido para inteiro
-        BroadcastOctetos = []
-        for octeto in self.Broadcast:  #Usa mesma lógica do de cima
-            BroadcastOctetos.append(int(octeto))  
-
-        PrimeiroEndereco = f"{RedeOctetos[0]}.{RedeOctetos[1]}.{RedeOctetos[2]}.{RedeOctetos[3] + 1}"  #Primeiro endereço válido
-        UltimoEndereco = f"{BroadcastOctetos[0]}.{BroadcastOctetos[1]}.{BroadcastOctetos[2]}.{BroadcastOctetos[3] - 1}"  #Último endereço válido
-        return PrimeiroEndereco, UltimoEndereco
-
-c1 = CalculadoraIp("192.168.1.10", "255.255.255.0")
-print(f"Endereço IP Válido: {c1.verificarEnderecoIPValido()}")
-print(f"Endereço de rede: {c1.calcularEnderecoRede()}")
-print(f"Endereço Broadcast: {c1.calcularBroadcast()}")
-print(f"Intervalo de Endereços Válidos: {c1.calcularFaixaEnderecosValidos()[0]} a {c1.calcularFaixaEnderecosValidos()[1]}")
+    def verificarPublicoPrivado(self):  #verifição pra saber se o endereço IP é público ou privado
+        return "Privado" if self.rede.is_private else "Público"
+    
+    def gerarTabela(self): #Gera a tabela de resultados com oq foi obtido
+        dados = {
+            'Detalhes': [ #Aqui está sendo definido oq vai aparecer na coluna detalhes
+                'Endereço IP',  
+                'Máscara de Sub-rede',  
+                'Máscara para Prefixo',  
+                'Endereço de Rede', 
+                'Primeiro Host',  
+                'Último Host',  
+                'Endereço de Broadcast',  
+                'Classe do Endereço',  
+                'Número de Sub-redes',  
+                'Hosts por Sub-rede',  
+                'Público/Privado',  
+                'Intervalo de IPs',  
+            ],
+            'Valores': [ #Aqui vai exibir os valores obtidos
+                self.enderecoIp,  
+                self.mascaraSubrede, 
+                self.mascaraParaPrefixo(),  
+                str(self.calcularEnderecoRede()),  
+                str(self.calcularPrimeiroHost()),  
+                str(self.calcularUltimoHost()), 
+                str(self.calcularEnderecoBroadcast()),  
+                self.classeEndereco,
+                self.calcularNumeroSubredes(),  
+                self.calcularHostsPorSubrede(), 
+                self.verificarPublicoPrivado(),
+                f"{str(self.calcularPrimeiroHost())} até {str(self.calcularUltimoHost())}",
+            ]
+        }
+        
+        df = pd.DataFrame(dados)  #Cria um DataFrame pandas com o dicionário dados
+        return df
