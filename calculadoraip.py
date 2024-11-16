@@ -46,12 +46,25 @@ class CalculadoraIp:
         return self.rede.broadcast_address
 
     def calcularNumeroSubredes(self):
-        prefixo_inicial = self.rede.network_address.max_prefixlen - self.rede.hostmask._prefix_from_ip_string(str(self.rede.hostmask))
-        prefixo_final = self.rede.prefixlen
-        return 2 ** (prefixo_final - prefixo_inicial)
+        prefixoAtual = self.rede.prefixlen  #Notação CIDR atual da máscara de sub-rede
+        prefixoBase = { #Determina o CIDR base de acordo com a classe de endereço
+            'A': 8,
+            'B': 16,
+            'C': 24
+        }.get(self.classeEndereco, None)
+        if prefixoBase is None:
+            raise ValueError(f"Classe de endereço inválida: {self.classeEndereco}")
+        bitsEmprestados = prefixoAtual - prefixoBase
+        if bitsEmprestados < 0:
+            raise ValueError(f"A máscara de sub-rede ({prefixoAtual}) é inválida para a classe {self.classeEndereco}.")
+        numSubredes = 2 ** bitsEmprestados
+        return numSubredes
 
-    def calcularHostsPorSubrede(self):  #Calculando o número de hosts por sub-rede
-        return self.rede.num_addresses 
+    def calcularHostsTotalPorSubrede(self):  #Calculando o número de hosts por sub-rede
+        return self.rede.num_addresses
+    
+    def calcularHostsUtilizaveisPorSubrede(self):
+        return self.rede.num_addresses - 2
     
     def verificarPublicoPrivado(self):  #verifição pra saber se o endereço IP é público ou privado
         return "Privado" if self.rede.is_private else "Público"
@@ -61,16 +74,17 @@ class CalculadoraIp:
             'Detalhes': [ #Aqui está sendo definido oq vai aparecer na coluna detalhes
                 'Endereço IP',  
                 'Máscara de Sub-rede',  
-                'Máscara para Prefixo',  
+                'Notação CIDR',  
                 'Endereço de Rede', 
                 'Primeiro Host',  
                 'Último Host',  
                 'Endereço de Broadcast',  
                 'Classe do Endereço',  
                 'Número de Sub-redes',  
-                'Hosts por Sub-rede',  
+                'Número total de Hosts por Sub-rede', 
+                'Número de Hosts por Sub-rede utilizáveis', 
                 'Público/Privado',  
-                'Intervalo de IPs',  
+                'Intervalo de IP de host utilizável',  
             ],
             'Valores': [ #Aqui vai exibir os valores obtidos
                 self.enderecoIp,  
@@ -82,7 +96,8 @@ class CalculadoraIp:
                 str(self.calcularEnderecoBroadcast()),  
                 self.classeEndereco,
                 self.calcularNumeroSubredes(),  
-                self.calcularHostsPorSubrede(), 
+                self.calcularHostsTotalPorSubrede(), 
+                self.calcularHostsUtilizaveisPorSubrede(),
                 self.verificarPublicoPrivado(),
                 f"{str(self.calcularPrimeiroHost())} até {str(self.calcularUltimoHost())}",
             ]
