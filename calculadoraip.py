@@ -53,13 +53,15 @@ class CalculadoraIp:
             'C': 24
         }.get(self.classeEndereco, None)
         if prefixoBase is None:
-            raise ValueError(f"A classe de endereço é inválida {self.classeEndereco}")
+            raise ValueError(f"Classe de endereço {self.classeEndereco} inválida para cálculos de rede.")
         bitsEmprestados = prefixoAtual - prefixoBase
         if bitsEmprestados < 0:
-            raise ValueError(f"A máscara de sub-rede ({prefixoAtual}) é inválida para a classe {self.classeEndereco}.")
+            raise ValueError(f"A máscara de sub-rede ({self.mascaraSubrede}) é inválida para a classe {self.classeEndereco}.")
         numSubredes = 2 ** bitsEmprestados
+        if numSubredes <= 0:
+            raise ValueError("Número de sub-redes calculado é inválido, verifique a máscara de sub-rede.")
         return numSubredes
-
+    
     def calcularHostsTotalPorSubrede(self):  #Calculando o número de hosts por sub-rede
         return self.rede.num_addresses
     
