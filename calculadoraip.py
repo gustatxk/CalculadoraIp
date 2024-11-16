@@ -53,7 +53,7 @@ class CalculadoraIp:
             'C': 24
         }.get(self.classeEndereco, None)
         if prefixoBase is None:
-            raise ValueError(f"Classe de endereço inválida: {self.classeEndereco}")
+            raise ValueError(f"A classe de endereço é inválida {self.classeEndereco}")
         bitsEmprestados = prefixoAtual - prefixoBase
         if bitsEmprestados < 0:
             raise ValueError(f"A máscara de sub-rede ({prefixoAtual}) é inválida para a classe {self.classeEndereco}.")
