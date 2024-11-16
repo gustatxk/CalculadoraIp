@@ -84,7 +84,7 @@ class CalculadoraIp:
                 'Número total de Hosts por Sub-rede', 
                 'Número de Hosts por Sub-rede utilizáveis', 
                 'Público/Privado',  
-                'Intervalo de IP de host utilizável',  
+                'Intervalo de IPs de host utilizável',  
             ],
             'Valores': [ #Aqui vai exibir os valores obtidos
                 self.enderecoIp,  
