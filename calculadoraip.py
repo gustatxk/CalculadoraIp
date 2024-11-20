@@ -7,7 +7,7 @@ from ipaddress import *  #Importando a biblioteca ipaddress para os cálculos
 import pandas as pd  #Importando pandas para fazer a tabela
 
 class CalculadoraIp:
-    def __init__(self, enderecoIp, mascaraSubrede):  #Aqui e o método construtor da classe
+    def __init__(self, enderecoIp, mascaraSubrede):  #Aqui é o método construtor da classe
         self.enderecoIp = enderecoIp  
         self.mascaraSubrede = mascaraSubrede  
         self.rede = IPv4Network(f"{enderecoIp}/{mascaraSubrede}", strict=False)  #Cria um objeto de rede IPv4 com o endereço IP e a máscara
