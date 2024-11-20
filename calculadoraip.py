@@ -7,11 +7,14 @@ from ipaddress import *  #Importando a biblioteca ipaddress para os cálculos
 import pandas as pd  #Importando pandas para fazer a tabela
 
 class CalculadoraIp:
-    def __init__(self, enderecoIp, mascaraSubrede):  #Aqui é o método construtor da classe
-        self.enderecoIp = enderecoIp  
-        self.mascaraSubrede = mascaraSubrede  
-        self.rede = IPv4Network(f"{enderecoIp}/{mascaraSubrede}", strict=False)  #Cria um objeto de rede IPv4 com o endereço IP e a máscara
-        self.classeEndereco = self.definirClasseIp(enderecoIp)  #chama a função para definir a classe do IP
+    def __init__(self, enderecoIp, mascaraSubrede):  
+        self.enderecoIp = enderecoIp
+        if "/" in mascaraSubrede: #Detectar se a máscara está em CIDR ou decimal
+            self.mascaraSubrede = str(IPv4Network(f"{enderecoIp}{mascaraSubrede}", strict=False).netmask)
+        else:
+            self.mascaraSubrede = mascaraSubrede 
+        self.rede = IPv4Network(f"{enderecoIp}/{self.mascaraSubrede}", strict=False) #Cria um objeto de rede IPv4 com o endereço IP e a máscara
+        self.classeEndereco = self.definirClasseIp(enderecoIp) #Chama o método para definir a classe do IP
 
     def mascaraParaPrefixo(self):  #função para a conversão da máscara de sub-rede para o formato de prefixo CIDR
         mascara_ip = self.mascaraSubrede.split(".")
