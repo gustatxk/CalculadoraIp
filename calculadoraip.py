@@ -49,20 +49,18 @@ class CalculadoraIp:
         return self.rede.broadcast_address
 
     def calcularNumeroSubredes(self):
-        prefixoAtual = self.rede.prefixlen  #Notação CIDR atual da máscara de sub-rede
-        prefixoBase = { #Determina o CIDR base de acordo com a classe de endereço
+        prefixoAtual = self.rede.prefixlen  #Obtém o prefixo atual da máscara (CIDR)
+        prefixoBase = { #Máscara base de acordo com a classe do IP
             'A': 8,
             'B': 16,
             'C': 24
-        }.get(self.classeEndereco, None)
-        if prefixoBase is None:
-            raise ValueError(f"Classe de endereço {self.classeEndereco} inválida para cálculos de rede.")
-        bitsEmprestados = prefixoAtual - prefixoBase
-        if bitsEmprestados < 0:
-            raise ValueError(f"A máscara de sub-rede ({self.mascaraSubrede}) é inválida para a classe {self.classeEndereco}.")
-        numSubredes = 2 ** bitsEmprestados
-        if numSubredes <= 0:
-            raise ValueError("Número de sub-redes calculado é inválido, verifique a máscara de sub-rede.")
+        }.get(self.classeEndereco)
+        if not prefixoBase: # Verifica se a classe é válida para o cálculo de sub-redes
+            return "Não aplicável para sub-redes"
+        bitsEmprestados = prefixoAtual - prefixoBase # Calcula os bits emprestados
+        if bitsEmprestados < 0:  # Se não há bits emprestados, não há sub-redes adicionais
+            return "Nenhum bit emprestado para sub-redes"
+        numSubredes = 2 ** bitsEmprestados # Calcula o número de sub-redes
         return numSubredes
     
     def calcularHostsTotalPorSubrede(self):  #Calculando o número de hosts por sub-rede
