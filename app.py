@@ -21,6 +21,6 @@ def main():
                 st.error(f"Erro: {e}")  # Exibe a mensagem de erro
         else:
             st.warning("Por favor, insira tanto o endereço IP quanto a máscara de sub-rede.")  # Mensagem de aviso
-
+            
 if __name__ == "__main__":
     main()
